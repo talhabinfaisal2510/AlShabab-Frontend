@@ -107,8 +107,8 @@ const CoverPage = () => {
           sx={{
             position: 'relative',
             overflow: 'hidden',
-            background: '#A73366',
-            borderBottom: '20px solid #6B1E42',
+            background: '#810c3c',
+            borderBottom: '20px solid #5a0a2a',
             color: 'white',
             fontSize: '92px',
             fontFamily: 'Arial, sans-serif',
@@ -118,19 +118,19 @@ const CoverPage = () => {
             padding: '24px 80px',
             minWidth: '400px',
             height: '200px',
-            boxShadow: '0 8px 16px rgba(139, 46, 92, 0.3)',
+            boxShadow: '0 8px 16px rgba(129, 12, 60, 0.3)',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
             '&:hover': {
-              background: '#B73D72',
-              borderBottom: '22px solid #7A2449',
-              boxShadow: '0 12px 24px rgba(139, 46, 92, 0.4)',
+              background: '#810c3c',
+              borderBottom: '22px solid #5a0a2a',
+              boxShadow: '0 12px 24px rgba(129, 12, 60, 0.4)',
               transform: 'translateY(-2px)'
             },
             '&:active': {
               transform: 'translateY(0px)',
-              boxShadow: '0 4px 8px rgba(139, 46, 92, 0.3)',
-              borderBottom: '18px solid #6B1E42'
+              boxShadow: '0 4px 8px rgba(129, 12, 60, 0.3)',
+              borderBottom: '18px solid #5a0a2a'
             }
           }}
         >

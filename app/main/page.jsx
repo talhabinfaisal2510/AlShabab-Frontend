@@ -1,18 +1,52 @@
 "use client";
 
-import React from 'react';
-import {
-  Box,
-  Typography,
-  IconButton,
-} from '@mui/material';
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, IconButton, Modal } from '@mui/material';
+import dynamic from 'next/dynamic';
+const DynamicImageCarousel = dynamic(() => import('../components/ImageCarousel'), { ssr: false });
+const DynamicVideoCarousel = dynamic(() => import('../components/VideoCarousel'), { ssr: false });
+const DynamicPdfViewer = dynamic(() => import('../components/PdfViewer'), { ssr: false });
+import MainMenuButton from '../components/menuButton';
+import PhotoCameraIcon from '@mui/icons-material/CameraAlt';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import YouTubeIcon from '@mui/icons-material/YouTube';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 
 const MainMenuPage = () => {
+  const [isPhotosOpen, setIsPhotosOpen] = useState(false);
+  const [isVideosOpen, setIsVideosOpen] = useState(false);
+  const [isPdfOpen, setIsPdfOpen] = useState(false);
+  const [prefetchedImages, setPrefetchedImages] = useState([]);
+  const [prefetchedVideos, setPrefetchedVideos] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const prefetch = async () => {
+      try {
+        const res = await fetch('/api/images', { method: 'GET' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (isMounted && Array.isArray(data)) setPrefetchedImages(data);
+      } catch {
+        // ignore prefetch errors
+      }
+    };
+    prefetch();
+    const prefetchVideos = async () => {
+      try {
+        const res = await fetch('/api/videos', { method: 'GET' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (isMounted && Array.isArray(data)) setPrefetchedVideos(data);
+      } catch {
+        // ignore
+      }
+    };
+    prefetchVideos();
+    return () => { isMounted = false; };
+  }, []);
+
   const handleButtonClick = (buttonName) => {
     console.log(`${buttonName} button clicked`);
     // Add navigation logic here
@@ -24,18 +58,21 @@ const MainMenuPage = () => {
       icon: <PhotoCameraIcon sx={{ fontSize: '120px', color: 'white' }} />,
       label: 'Photos',
       onClick: () => handleButtonClick('Photos'),
+      openModal: () => setIsPhotosOpen(true),
     },
     {
       id: 'brochure',
       icon: <MenuBookIcon sx={{ fontSize: '140px', color: 'white' }} />,
       label: 'Brochure',
       onClick: () => handleButtonClick('Brochure'),
+      openModal: () => setIsPdfOpen(true),
     },
     {
       id: 'video',
-      icon: <PlayArrowIcon sx={{ fontSize: '120px', color: 'white' }} />,
+      icon: <YouTubeIcon sx={{ fontSize: '120px', color: 'white' }} />,
       label: 'Video',
       onClick: () => handleButtonClick('Video'),
+      openModal: () => setIsVideosOpen(true),
     },
     {
       id: 'location',
@@ -147,21 +184,36 @@ const MainMenuPage = () => {
             }}
           >
             <IconButton
-              onClick={menuButtons[0].onClick}
+              onClick={menuButtons[0].openModal}
               sx={{
                 width: '320px',
                 height: '320px',
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                border: '3px solid rgba(255, 255, 255, 0.8)',
+                background: 'linear-gradient(180deg, #3e3e3e 0%, #0f0f0f 100%)',
+                border: '2px solid rgba(255,255,255,0.75)',
                 borderRadius: '50%',
+                position: 'relative',
+                overflow: 'visible',
                 backdropFilter: 'blur(10px)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '8px',
+                boxShadow: '0 18px 40px rgba(0,0,0,0.45), inset 0 4px 10px rgba(255,255,255,0.08)',
+                '&:after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-40px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '100%',
+                  height: '36px',
+                  background: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%)',
+                  filter: 'blur(10px)',
+                  pointerEvents: 'none'
+                },
                 '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                  background: 'linear-gradient(180deg, #4a4a4a 0%, #141414 100%)',
                   transform: 'scale(1.05)',
-                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.4)',
+                  boxShadow: '0 22px 50px rgba(0,0,0,0.55), inset 0 6px 12px rgba(255,255,255,0.1)',
                 },
                 transition: 'all 0.3s ease',
               }}
@@ -189,21 +241,36 @@ const MainMenuPage = () => {
             }}
           >
             <IconButton
-              onClick={menuButtons[1].onClick}
+              onClick={menuButtons[1].openModal}
               sx={{
                 width: '380px',
                 height: '380px',
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                border: '3px solid rgba(255, 255, 255, 0.8)',
+                background: 'linear-gradient(180deg, #3e3e3e 0%, #0f0f0f 100%)',
+                border: '2px solid rgba(255,255,255,0.75)',
                 borderRadius: '50%',
+                position: 'relative',
+                overflow: 'visible',
                 backdropFilter: 'blur(10px)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '12px',
+                boxShadow: '0 18px 40px rgba(0,0,0,0.45), inset 0 4px 10px rgba(255,255,255,0.08)',
+                '&:after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-40px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '100%',
+                  height: '36px',
+                  background: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%)',
+                  filter: 'blur(10px)',
+                  pointerEvents: 'none'
+                },
                 '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                  background: 'linear-gradient(180deg, #4a4a4a 0%, #141414 100%)',
                   transform: 'scale(1.05)',
-                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.4)',
+                  boxShadow: '0 22px 50px rgba(0,0,0,0.55), inset 0 6px 12px rgba(255,255,255,0.1)',
                 },
                 transition: 'all 0.3s ease',
               }}
@@ -231,21 +298,36 @@ const MainMenuPage = () => {
             }}
           >
             <IconButton
-              onClick={menuButtons[2].onClick}
+              onClick={menuButtons[2].openModal}
               sx={{
                 width: '320px',
                 height: '320px',
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                border: '3px solid rgba(255, 255, 255, 0.8)',
+                background: 'linear-gradient(180deg, #3e3e3e 0%, #0f0f0f 100%)',
+                border: '2px solid rgba(255,255,255,0.75)',
                 borderRadius: '50%',
+                position: 'relative',
+                overflow: 'visible',
                 backdropFilter: 'blur(10px)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '8px',
+                boxShadow: '0 18px 40px rgba(0,0,0,0.45), inset 0 4px 10px rgba(255,255,255,0.08)',
+                '&:after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-40px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '100%',
+                  height: '36px',
+                  background: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%)',
+                  filter: 'blur(10px)',
+                  pointerEvents: 'none'
+                },
                 '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                  background: 'linear-gradient(180deg, #4a4a4a 0%, #141414 100%)',
                   transform: 'scale(1.05)',
-                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.4)',
+                  boxShadow: '0 22px 50px rgba(0,0,0,0.55), inset 0 6px 12px rgba(255,255,255,0.1)',
                 },
                 transition: 'all 0.3s ease',
               }}
@@ -277,17 +359,32 @@ const MainMenuPage = () => {
               sx={{
                 width: '320px',
                 height: '320px',
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                border: '3px solid rgba(255, 255, 255, 0.8)',
+                background: 'linear-gradient(180deg, #3e3e3e 0%, #0f0f0f 100%)',
+                border: '2px solid rgba(255,255,255,0.75)',
                 borderRadius: '50%',
+                position: 'relative',
+                overflow: 'visible',
                 backdropFilter: 'blur(10px)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '8px',
+                boxShadow: '0 18px 40px rgba(0,0,0,0.45), inset 0 4px 10px rgba(255,255,255,0.08)',
+                '&:after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-40px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '100%',
+                  height: '36px',
+                  background: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%)',
+                  filter: 'blur(10px)',
+                  pointerEvents: 'none'
+                },
                 '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                  background: 'linear-gradient(180deg, #4a4a4a 0%, #141414 100%)',
                   transform: 'scale(1.05)',
-                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.4)',
+                  boxShadow: '0 22px 50px rgba(0,0,0,0.55), inset 0 6px 12px rgba(255,255,255,0.1)',
                 },
                 transition: 'all 0.3s ease',
               }}
@@ -319,17 +416,32 @@ const MainMenuPage = () => {
               sx={{
                 width: '320px',
                 height: '320px',
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                border: '3px solid rgba(255, 255, 255, 0.8)',
+                background: 'linear-gradient(180deg, #3e3e3e 0%, #0f0f0f 100%)',
+                border: '2px solid rgba(255,255,255,0.75)',
                 borderRadius: '50%',
+                position: 'relative',
+                overflow: 'visible',
                 backdropFilter: 'blur(10px)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '8px',
+                boxShadow: '0 18px 40px rgba(0,0,0,0.45), inset 0 4px 10px rgba(255,255,255,0.08)',
+                '&:after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-40px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '100%',
+                  height: '36px',
+                  background: 'radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%)',
+                  filter: 'blur(10px)',
+                  pointerEvents: 'none'
+                },
                 '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                  transform: 'translateX(-50%) scale(1.05)',
-                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.4)',
+                  background: 'linear-gradient(180deg, #4a4a4a 0%, #141414 100%)',
+                  transform: 'scale(1.05)',
+                  boxShadow: '0 22px 50px rgba(0,0,0,0.55), inset 0 6px 12px rgba(255,255,255,0.1)',
                 },
                 transition: 'all 0.3s ease',
               }}
@@ -349,6 +461,240 @@ const MainMenuPage = () => {
           </Box>
         </Box>
       </Box>
+
+      {/* Photos Modal - reuse the Photos page inside a modal via iframe to avoid code duplication */}
+      <Modal
+        open={isPhotosOpen}
+        onClose={() => setIsPhotosOpen(false)}
+        aria-labelledby="photos-modal"
+        aria-describedby="photos-gallery"
+        BackdropProps={{
+          style: { backgroundColor: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(2px)' }
+        }}
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '20%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '85vw',
+            height: '60vh',
+          }}
+        >
+          {/* Photos Badge */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '-60px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 1,
+            }}
+          >
+            <Box
+              sx={{
+                backgroundColor: '#810c3c',
+                color: 'white',
+                padding: '14px 48px',
+                borderRadius: '25px',
+                fontSize: '24px',
+                fontWeight: 'bold',
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
+                border: '2px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: '0 4px 12px rgba(139, 30, 69, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                minWidth: '320px',
+                justifyContent: 'center',
+                position: 'relative',
+                '&:before': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-8px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 0,
+                  height: 0,
+                  borderLeft: '8px solid transparent',
+                  borderRight: '8px solid transparent',
+                  borderTop: '8px solid #810c3c',
+                }
+              }}
+            >
+              <PhotoCameraIcon sx={{ fontSize: '36px' }} />
+              Photos
+            </Box>
+          </Box>
+
+          <Box sx={{ width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between' }}>
+            <Box sx={{ flex: '1 1 auto', minHeight: 0 }}>
+              <DynamicImageCarousel initialImages={prefetchedImages} />
+            </Box>
+            <Box sx={{ flex: '0 0 auto', background: 'transparent' }}>
+              <MainMenuButton onClose={() => setIsPhotosOpen(false)} />
+            </Box>
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* Videos Modal */}
+      <Modal
+        open={isVideosOpen}
+        onClose={() => setIsVideosOpen(false)}
+        aria-labelledby="videos-modal"
+        aria-describedby="videos-gallery"
+        BackdropProps={{
+          style: { backgroundColor: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(2px)' }
+        }}
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '20%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '85vw',
+            height: '60vh',
+          }}
+        >
+          {/* Videos Badge */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '-60px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 1,
+            }}
+          >
+            <Box
+              sx={{
+                backgroundColor: '#810c3c',
+                color: 'white',
+                padding: '14px 48px',
+                borderRadius: '25px',
+                fontSize: '24px',
+                fontWeight: 'bold',
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
+                border: '2px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: '0 4px 12px rgba(129, 12, 60, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                minWidth: '320px',
+                justifyContent: 'center',
+                position: 'relative',
+                '&:before': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-8px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 0,
+                  height: 0,
+                  borderLeft: '8px solid transparent',
+                  borderRight: '8px solid transparent',
+                  borderTop: '8px solid #810c3c',
+                }
+              }}
+            >
+              <YouTubeIcon sx={{ fontSize: '38px' }} />
+              Video
+            </Box>
+          </Box>
+
+          <Box sx={{ width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between' }}>
+            <Box sx={{ flex: '1 1 auto', minHeight: 0 }}>
+              <DynamicVideoCarousel initialVideos={prefetchedVideos} />
+            </Box>
+            <Box sx={{ flex: '0 0 auto', background: 'transparent' }}>
+              <MainMenuButton onClose={() => setIsVideosOpen(false)} />
+            </Box>
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* Brochure (PDF) Modal */}
+      <Modal
+        open={isPdfOpen}
+        onClose={() => setIsPdfOpen(false)}
+        aria-labelledby="pdf-modal"
+        aria-describedby="brochure-pdf"
+        BackdropProps={{
+          style: { backgroundColor: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(2px)' }
+        }}
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '20%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '85vw',
+            height: '60vh',
+            overflow: 'hidden'
+          }}
+        >
+          {/* PDF Badge */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '-60px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 1,
+            }}
+          >
+            <Box
+              sx={{
+                backgroundColor: '#810c3c',
+                color: 'white',
+                padding: '14px 48px',
+                borderRadius: '25px',
+                fontSize: '24px',
+                fontWeight: 'bold',
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
+                border: '2px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: '0 4px 12px rgba(129, 12, 60, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                minWidth: '320px',
+                justifyContent: 'center',
+                position: 'relative',
+                '&:before': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-8px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 0,
+                  height: 0,
+                  borderLeft: '8px solid transparent',
+                  borderRight: '8px solid transparent',
+                  borderTop: '8px solid #810c3c',
+                }
+              }}
+            >
+              Brochure
+            </Box>
+          </Box>
+
+          <Box sx={{ width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between' }}>
+            <Box sx={{ flex: '1 1 auto', minHeight: 0 }}>
+              <DynamicPdfViewer />
+            </Box>
+            <Box sx={{ flex: '0 0 auto', background: 'transparent' }}>
+              <MainMenuButton onClose={() => setIsPdfOpen(false)} />
+            </Box>
+          </Box>
+        </Box>
+      </Modal>
 
       {/* Company Branding Box at bottom (match cover page) */}
       <Box
