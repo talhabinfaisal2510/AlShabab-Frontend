@@ -9,7 +9,7 @@ const MainMenuButton = ({ onClose }) => {
     };
 
     return (
-        <Box sx={{ padding: '50px', display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ padding: '50px', display: 'flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
             <Button
                 disableRipple
                 onClick={handleClick}
@@ -31,16 +31,16 @@ const MainMenuButton = ({ onClose }) => {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     cursor: 'pointer',
-                    boxShadow: '0 8px 16px rgba(139, 46, 92, 0.3)',
+						boxShadow: 'none',
                     transition: 'all 0.3s ease',
-                    '&:hover': {
-                        backgroundColor: '#810c3c',
+						'&:hover': {
+							backgroundColor: 'transparent',
                         transform: 'translateY(-2px)',
-                        boxShadow: '0 12px 24px rgba(139, 46, 92, 0.4)'
+							boxShadow: 'none'
                     },
                     '&:active': {
                         transform: 'translateY(0px)',
-                        boxShadow: '0 8px 16px rgba(139, 46, 92, 0.3)'
+							boxShadow: 'none'
                     }
                 }}
             >

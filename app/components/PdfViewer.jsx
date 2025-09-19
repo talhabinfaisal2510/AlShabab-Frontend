@@ -40,7 +40,7 @@ const PdfViewer = () => {
       const w = window.innerWidth || 0;
       if (w <= 480) setScale(2.0);
       else if (w <= 768) setScale(1.8);
-      else setScale(3.6);
+      else setScale(2);
     }
   }, []);
 
@@ -98,9 +98,9 @@ const PdfViewer = () => {
             <CloudUploadIcon sx={{ mr: 1.5, mb: 0.5, fontSize: 38 }} />
             {isUploading ? 'Uploading…' : 'Upload PDF'}
           </Button>
-          <Tooltip title="Zoom in"><span><IconButton onClick={zoomIn} sx={{ backgroundColor: 'rgba(0,0,0,0.08)' }}><ZoomInIcon /></IconButton></span></Tooltip>
-          <Tooltip title="Zoom out"><span><IconButton onClick={zoomOut} sx={{ backgroundColor: 'rgba(0,0,0,0.08)' }}><ZoomOutIcon /></IconButton></span></Tooltip>
-          <Tooltip title="Reset"><span><IconButton onClick={resetZoom} sx={{ backgroundColor: 'rgba(0,0,0,0.08)' }}><RestartAltIcon /></IconButton></span></Tooltip>
+          <Tooltip title="Zoom in"><span><IconButton onClick={zoomIn} sx={{ backgroundColor: 'rgba(0,0,0,0.08)', width: 56, height: 56 }}><ZoomInIcon sx={{ fontSize: 36 }} /></IconButton></span></Tooltip>
+          <Tooltip title="Zoom out"><span><IconButton onClick={zoomOut} sx={{ backgroundColor: 'rgba(0,0,0,0.08)', width: 56, height: 56 }}><ZoomOutIcon sx={{ fontSize: 36 }} /></IconButton></span></Tooltip>
+          <Tooltip title="Reset"><span><IconButton onClick={resetZoom} sx={{ backgroundColor: 'rgba(0,0,0,0.08)', width: 56, height: 56 }}><RestartAltIcon sx={{ fontSize: 34 }} /></IconButton></span></Tooltip>
         </Box>
       </Box>
 

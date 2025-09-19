@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, IconButton, Modal } from '@mui/material';
-import dynamic from 'next/dynamic';
 const DynamicImageCarousel = dynamic(() => import('../components/ImageCarousel'), { ssr: false });
 const DynamicVideoCarousel = dynamic(() => import('../components/VideoCarousel'), { ssr: false });
 const DynamicPdfViewer = dynamic(() => import('../components/PdfViewer'), { ssr: false });
@@ -12,6 +11,9 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
+import dynamic from 'next/dynamic';
+const DynamicMapModal = dynamic(() => import('../components/mapModal'), { ssr: false });
+const DynamicWebViewModal = dynamic(() => import('../components/webViewModal'), { ssr: false }); // Added WebViewModal import
 
 const MainMenuPage = () => {
   const [isPhotosOpen, setIsPhotosOpen] = useState(false);
@@ -19,6 +21,8 @@ const MainMenuPage = () => {
   const [isPdfOpen, setIsPdfOpen] = useState(false);
   const [prefetchedImages, setPrefetchedImages] = useState([]);
   const [prefetchedVideos, setPrefetchedVideos] = useState([]);
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const [isSignUpOpen, setIsSignUpOpen] = useState(false); // Added state for Sign-Up modal
 
   useEffect(() => {
     let isMounted = true;
@@ -79,12 +83,14 @@ const MainMenuPage = () => {
       icon: <LocationOnIcon sx={{ fontSize: '120px', color: 'white' }} />,
       label: 'Location',
       onClick: () => handleButtonClick('Location'),
+      openModal: () => setIsLocationOpen(true), // Add this line
     },
-    {
+   {
       id: 'signup',
       icon: <HowToRegIcon sx={{ fontSize: '120px', color: 'white' }} />,
       label: 'Sign-Up',
       onClick: () => handleButtonClick('Sign-Up'),
+      openModal: () => setIsSignUpOpen(true), // Added modal functionality for Sign-Up
     },
   ];
 
@@ -139,7 +145,6 @@ const MainMenuPage = () => {
       >
         <Box
           component="video"
-          controls
           autoPlay
           muted
           loop
@@ -355,7 +360,7 @@ const MainMenuPage = () => {
             }}
           >
             <IconButton
-              onClick={menuButtons[3].onClick}
+              onClick={menuButtons[3].openModal}
               sx={{
                 width: '320px',
                 height: '320px',
@@ -412,7 +417,7 @@ const MainMenuPage = () => {
             }}
           >
             <IconButton
-              onClick={menuButtons[4].onClick}
+              onClick={menuButtons[4].openModal} // Changed to use modal instead of onClick
               sx={{
                 width: '320px',
                 height: '320px',
@@ -636,7 +641,7 @@ const MainMenuPage = () => {
             transform: 'translateX(-50%)',
             width: '85vw',
             height: '60vh',
-            overflow: 'hidden'
+            overflow: 'visible'
           }}
         >
           {/* PDF Badge */}
@@ -681,6 +686,7 @@ const MainMenuPage = () => {
                 }
               }}
             >
+              <MenuBookIcon sx={{ fontSize: '38px' }} />
               Brochure
             </Box>
           </Box>
@@ -695,7 +701,22 @@ const MainMenuPage = () => {
           </Box>
         </Box>
       </Modal>
+      {/* Location Modal */}
+      {/* Location Modal */}
+      <DynamicMapModal
+        open={isLocationOpen}
+        onClose={() => setIsLocationOpen(false)}
+        mapUrl="https://maps.google.com/maps?q=23.586465995053583,58.403226873529675&hl=en&z=21&output=embed"
+      />
 
+      {/* Sign-Up Modal - Added new modal for external website */}
+      <DynamicWebViewModal
+        open={isSignUpOpen}
+        onClose={() => setIsSignUpOpen(false)}
+        url="https://eventpass.whitewall.solutions/eventreg/event/al-shabab-business-center"
+        title="Sign-Up"
+        icon={<HowToRegIcon />}
+      />
       {/* Company Branding Box at bottom (match cover page) */}
       <Box
         sx={{
@@ -725,6 +746,7 @@ const MainMenuPage = () => {
           }}
         />
       </Box>
+     
     </Box>
   );
 };
