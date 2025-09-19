@@ -104,7 +104,7 @@ const WebViewModal = ({ open, onClose, url, title = "Web View", icon = null }) =
                 height: '100%',
                 border: 'none',
                 display: 'block',
-                transform: 'scale(2)',
+                transform: 'scale(1.5)',
                 transformOrigin: 'center center'
               }}
               title={title}
